@@ -15,36 +15,30 @@
 
 extern void vApplicationStackOverflowHook(xTaskHandle *pxTask,signed portCHAR *pcTaskName);
 
-void
-vApplicationStackOverflowHook(xTaskHandle *pxTask,signed portCHAR *pcTaskName) {
+void vApplicationStackOverflowHook(xTaskHandle *pxTask,signed portCHAR *pcTaskName) {
 	(void)pxTask;
 	(void)pcTaskName;
 	for(;;);
 }
 
-static void
-gpio_setup(void) {
+static void gpio_setup(void) {
 
 	rcc_clock_setup_in_hse_8mhz_out_72mhz();	// Use this for "blue pill"
 	rcc_periph_clock_enable(RCC_GPIOC);
 	gpio_set_mode(GPIOC,GPIO_MODE_OUTPUT_2_MHZ,GPIO_CNF_OUTPUT_PUSHPULL,GPIO13);
 }
 
-static void
-task1(void *args) {
-	int i;
+static void task1(void *args) {
 
 	(void)args;
 
 	for (;;) {
 		gpio_toggle(GPIOC,GPIO13);
-		for (i = 0; i < 300000; i++)
-			__asm__("nop");
+		vTaskDelay(pdMS_TO_TICKS(500));
 	}
 }
 
-int
-main(void) {
+int main(void) {
 
 	gpio_setup();
 	xTaskCreate(task1,"LED",100,NULL,configMAX_PRIORITIES-1,NULL);
