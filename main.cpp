@@ -15,7 +15,7 @@
 
 extern void vApplicationStackOverflowHook(xTaskHandle *pxTask,signed portCHAR *pcTaskName);
 
-void vApplicationStackOverflowHook(xTaskHandle *pxTask,signed portCHAR *pcTaskName) {
+void vApplicationStackOverflowHook(xTaskHandle *pxTask,signed portCHAR *pcTaskName){
 	(void)pxTask;
 	(void)pcTaskName;
 	for(;;);
