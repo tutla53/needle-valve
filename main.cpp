@@ -26,6 +26,7 @@
 /* All pins use GPIOA port*/
 #define startPin	GPIO2	// I: Start Button
 #define stopPin		GPIO3	// I: Stop Button
+#define pumpPin		GPIO4	// O: Start MicroPump
 
 extern void vApplicationStackOverflowHook(xTaskHandle *pxTask,signed portCHAR *pcTaskName);
 
@@ -41,6 +42,7 @@ static void gpio_setup(void) {
 	rcc_periph_clock_enable(RCC_GPIOC);
 	rcc_periph_clock_enable(RCC_GPIOA);
 	gpio_set_mode(GPIOC,GPIO_MODE_OUTPUT_2_MHZ,GPIO_CNF_OUTPUT_PUSHPULL,GPIO13);
+	gpio_set_mode(GPIOA,GPIO_MODE_OUTPUT_2_MHZ,GPIO_CNF_OUTPUT_PUSHPULL,pumpPin);
 	gpio_set_mode(GPIOA,GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN, startPin|stopPin);
 	
 }
@@ -84,6 +86,7 @@ static void pwm_setup(void){
 static void task1(void *args __attribute__((unused))) {
 	
 	bool startStat = 0, stopStat = 0, sysStart = 0;
+	int pos = min_pulse, inc = 10;
 	
 	for (;;) {
 		startStat = gpio_get(GPIOA,startPin);
@@ -93,24 +96,20 @@ static void task1(void *args __attribute__((unused))) {
 		if(stopStat  && !startStat && sysStart) sysStart = 0;
 		
 		if(sysStart){
+			gpio_set(GPIOA, pumpPin);
 			gpio_clear(GPIOC,GPIO13);
-			
-			for (int i = min_pulse; i <= max_pulse; i=i+5){
-				timer_set_oc_value(TIM3,TIM_OC3,i);
-				vTaskDelay(pdMS_TO_TICKS(2));
+			timer_set_oc_value(TIM3,TIM_OC3,pos);
+			vTaskDelay(pdMS_TO_TICKS(75));
+			pos += inc;
+			if((pos > max_pulse) || (pos < min_pulse)){
+				inc = -inc;
+				vTaskDelay(pdMS_TO_TICKS(500));
 			}
-			vTaskDelay(pdMS_TO_TICKS(500));
-		
-			gpio_toggle(GPIOC,GPIO13);
-			for (int i = max_pulse; i >= min_pulse; i=i-5){
-				timer_set_oc_value(TIM3,TIM_OC3,i);
-				vTaskDelay(pdMS_TO_TICKS(2));
-			}		
-			vTaskDelay(pdMS_TO_TICKS(500));
 		}
 		
 		else{
 			gpio_set(GPIOC, GPIO13);
+			gpio_clear(GPIOA, pumpPin);
 		}
 	}
 }
