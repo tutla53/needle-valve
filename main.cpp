@@ -6,7 +6,8 @@
 			- Needle Valve
 			- MPX5100DP or MPX5500DP Pressure Sensor
 			
- * Version:	1.Sweep Servo Motor (PB0 == TIM3.CH3) 
+ * Version:	1. Sweep Servo Motor (PB0 == TIM3.CH3)
+			2. Add Button to Start and Stop Servo Sweep
  */
  
 #include <string.h>
@@ -22,6 +23,10 @@
 #define min_pulse 	550
 #define max_pulse	2350
 
+/* All pins use GPIOA port*/
+#define startPin	GPIO2	// I: Start Button
+#define stopPin		GPIO3	// I: Stop Button
+
 extern void vApplicationStackOverflowHook(xTaskHandle *pxTask,signed portCHAR *pcTaskName);
 
 void vApplicationStackOverflowHook(xTaskHandle *pxTask,signed portCHAR *pcTaskName){
@@ -30,9 +35,17 @@ void vApplicationStackOverflowHook(xTaskHandle *pxTask,signed portCHAR *pcTaskNa
 	for(;;);
 }
 
-static void pwm_setup(void){
+static void gpio_setup(void) {
+	
+	rcc_clock_setup_in_hse_8mhz_out_72mhz();	// Use this for "blue pill"
+	rcc_periph_clock_enable(RCC_GPIOC);
+	rcc_periph_clock_enable(RCC_GPIOA);
+	gpio_set_mode(GPIOC,GPIO_MODE_OUTPUT_2_MHZ,GPIO_CNF_OUTPUT_PUSHPULL,GPIO13);
+	gpio_set_mode(GPIOA,GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN, startPin|stopPin);
+	
+}
 
-	gpio_set(GPIOC,GPIO13);				// LED on
+static void pwm_setup(void){
 
 	rcc_periph_clock_enable(RCC_TIM3);		// Need TIM3 clock
 	rcc_periph_clock_enable(RCC_AFIO);		// Need AFIO clock
@@ -68,29 +81,37 @@ static void pwm_setup(void){
 	timer_enable_counter(TIM3);
 }
 
-static void gpio_setup(void) {
-	
-	rcc_clock_setup_in_hse_8mhz_out_72mhz();	// Use this for "blue pill"
-	rcc_periph_clock_enable(RCC_GPIOC);
-	gpio_set_mode(GPIOC,GPIO_MODE_OUTPUT_2_MHZ,GPIO_CNF_OUTPUT_PUSHPULL,GPIO13);
-}
-
 static void task1(void *args __attribute__((unused))) {
 	
+	bool startStat = 0, stopStat = 0, sysStart = 0;
+	
 	for (;;) {
-		gpio_toggle(GPIOC,GPIO13);
-		for (int i = min_pulse; i <= max_pulse; i=i+5){
-			timer_set_oc_value(TIM3,TIM_OC3,i);
-			vTaskDelay(pdMS_TO_TICKS(2));
-		}
-		vTaskDelay(pdMS_TO_TICKS(500));
+		startStat = gpio_get(GPIOA,startPin);
+		stopStat =gpio_get(GPIOA, stopPin);
 		
-		gpio_toggle(GPIOC,GPIO13);
-		for (int i = max_pulse; i >= min_pulse; i=i-5){
-			timer_set_oc_value(TIM3,TIM_OC3,i);
-			vTaskDelay(pdMS_TO_TICKS(2));
-		}		
-		vTaskDelay(pdMS_TO_TICKS(500));
+		if(startStat && !stopStat  && !sysStart) sysStart = 1;
+		if(stopStat  && !startStat && sysStart) sysStart = 0;
+		
+		if(sysStart){
+			gpio_clear(GPIOC,GPIO13);
+			
+			for (int i = min_pulse; i <= max_pulse; i=i+5){
+				timer_set_oc_value(TIM3,TIM_OC3,i);
+				vTaskDelay(pdMS_TO_TICKS(2));
+			}
+			vTaskDelay(pdMS_TO_TICKS(500));
+		
+			gpio_toggle(GPIOC,GPIO13);
+			for (int i = max_pulse; i >= min_pulse; i=i-5){
+				timer_set_oc_value(TIM3,TIM_OC3,i);
+				vTaskDelay(pdMS_TO_TICKS(2));
+			}		
+			vTaskDelay(pdMS_TO_TICKS(500));
+		}
+		
+		else{
+			gpio_set(GPIOC, GPIO13);
+		}
 	}
 }
 
