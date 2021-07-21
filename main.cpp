@@ -19,8 +19,8 @@
 
 #define mainECHO_TASK_PRIORITY				( tskIDLE_PRIORITY + 1 )
 
-#define min_pulse 	400
-#define max_pulse	2400
+#define min_pulse 	550
+#define max_pulse	2350
 
 extern void vApplicationStackOverflowHook(xTaskHandle *pxTask,signed portCHAR *pcTaskName);
 
@@ -32,6 +32,8 @@ void vApplicationStackOverflowHook(xTaskHandle *pxTask,signed portCHAR *pcTaskNa
 
 static void pwm_setup(void){
 
+	gpio_set(GPIOC,GPIO13);				// LED on
+
 	rcc_periph_clock_enable(RCC_TIM3);		// Need TIM3 clock
 	rcc_periph_clock_enable(RCC_AFIO);		// Need AFIO clock
 
@@ -39,9 +41,9 @@ static void pwm_setup(void){
 	rcc_periph_clock_enable(RCC_GPIOB);		// Need GPIOB clock
 	gpio_primary_remap(
 		AFIO_MAPR_SWJ_CFG_JTAG_OFF_SW_OFF,	// Optional
-		AFIO_MAPR_TIM3_REMAP_NO_REMAP);		// This is default: TIM3.CH3=GPIOB0
+		AFIO_MAPR_TIM2_REMAP_NO_REMAP);		// This is default: TIM3.CH3=GPIOB0
 	gpio_set_mode(GPIOB,GPIO_MODE_OUTPUT_50_MHZ,	// High speed
-		GPIO_CNF_OUTPUT_ALTFN_PUSHPULL,GPIO0);		// GPIOB0=TIM2.CH2
+		GPIO_CNF_OUTPUT_ALTFN_PUSHPULL,GPIO0);	// GPIOB0=TIM3.CH3
 
 	// TIM3:
 	timer_disable_counter(TIM3);
@@ -56,13 +58,13 @@ static void pwm_setup(void){
 	// timer_set_repetition_counter(TIM3,0);
 	timer_enable_preload(TIM3);
 	timer_continuous_mode(TIM3);
-	timer_set_period(TIM3,20000-1); /*20 ms pwm period*/
+	timer_set_period(TIM3,20000-1);
 
 	timer_disable_oc_output(TIM3,TIM_OC3);
 	timer_set_oc_mode(TIM3,TIM_OC3,TIM_OCM_PWM1);
 	timer_enable_oc_output(TIM3,TIM_OC3);
 
-	timer_set_oc_value(TIM3,TIM_OC3, min_value);
+	timer_set_oc_value(TIM3,TIM_OC3,min_pulse);
 	timer_enable_counter(TIM3);
 }
 
@@ -73,15 +75,22 @@ static void gpio_setup(void) {
 	gpio_set_mode(GPIOC,GPIO_MODE_OUTPUT_2_MHZ,GPIO_CNF_OUTPUT_PUSHPULL,GPIO13);
 }
 
-static void task1() {
-	static const int delta = (max_pulse-min_pulse)/3;
-	static const int ms[4] = { min_pulse, min_pulse+delta, max_pulse-delta, max_pulse};
-	int msx = 0;
+static void task1(void *args __attribute__((unused))) {
 	
 	for (;;) {
 		gpio_toggle(GPIOC,GPIO13);
-		msx = (msx+1) % 4;
-		timer_set_oc_value(TIM2,TIM_OC2,ms[msx]);
+		for (int i = min_pulse; i <= max_pulse; i=i+5){
+			timer_set_oc_value(TIM3,TIM_OC3,i);
+			vTaskDelay(pdMS_TO_TICKS(2));
+		}
+		vTaskDelay(pdMS_TO_TICKS(500));
+		
+		gpio_toggle(GPIOC,GPIO13);
+		for (int i = max_pulse; i >= min_pulse; i=i-5){
+			timer_set_oc_value(TIM3,TIM_OC3,i);
+			vTaskDelay(pdMS_TO_TICKS(2));
+		}		
+		vTaskDelay(pdMS_TO_TICKS(500));
 	}
 }
 
@@ -89,7 +98,7 @@ int main(void) {
 
 	gpio_setup();
 	pwm_setup();
-	xTaskCreate(task1,"LED",100,NULL,configMAX_PRIORITIES-1,NULL);
+	xTaskCreate(task1,"task1",100,NULL,1,NULL);
 	vTaskStartScheduler();
 	for (;;)
 		;

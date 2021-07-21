@@ -23,6 +23,9 @@ main.o: main.cpp /usr/include/newlib/string.h /usr/include/newlib/_ansi.h \
  /home/hades/bp/stm32/libopencm3/include/libopencm3/stm32/gpio.h \
  /home/hades/bp/stm32/libopencm3/include/libopencm3/stm32/f1/gpio.h \
  /home/hades/bp/stm32/libopencm3/include/libopencm3/stm32/common/gpio_common_all.h \
+ /home/hades/bp/stm32/libopencm3/include/libopencm3/stm32/timer.h \
+ /home/hades/bp/stm32/libopencm3/include/libopencm3/stm32/f1/timer.h \
+ /home/hades/bp/stm32/libopencm3/include/libopencm3/stm32/common/timer_common_all.h \
  /home/hades/bp/stm32/libopencm3/include/libopencm3/cm3/nvic.h \
  /home/hades/bp/stm32/libopencm3/include/libopencm3/dispatch/nvic.h \
  /home/hades/bp/stm32/libopencm3/include/libopencm3/stm32/f1/nvic.h
