@@ -12,20 +12,20 @@ main.o: main.cpp /usr/include/newlib/string.h /usr/include/newlib/_ansi.h \
  /usr/lib/gcc/arm-none-eabi/9.2.1/include/stdint.h FreeRTOSConfig.h \
  rtos/projdefs.h rtos/portable.h rtos/deprecated_definitions.h \
  rtos/portmacro.h rtos/mpu_wrappers.h rtos/task.h rtos/list.h \
- /home/hades/bp/stm32/libopencm3/include/libopencm3/stm32/rcc.h \
- /home/hades/bp/stm32/libopencm3/include/libopencm3/cm3/common.h \
+ /home/supernova/bp/stm32/libopencm3/include/libopencm3/stm32/rcc.h \
+ /home/supernova/bp/stm32/libopencm3/include/libopencm3/cm3/common.h \
  /usr/lib/gcc/arm-none-eabi/9.2.1/include/stdbool.h \
- /home/hades/bp/stm32/libopencm3/include/libopencm3/stm32/memorymap.h \
- /home/hades/bp/stm32/libopencm3/include/libopencm3/stm32/f1/memorymap.h \
- /home/hades/bp/stm32/libopencm3/include/libopencm3/cm3/memorymap.h \
- /home/hades/bp/stm32/libopencm3/include/libopencm3/stm32/f1/rcc.h \
- /home/hades/bp/stm32/libopencm3/include/libopencm3/stm32/common/rcc_common_all.h \
- /home/hades/bp/stm32/libopencm3/include/libopencm3/stm32/gpio.h \
- /home/hades/bp/stm32/libopencm3/include/libopencm3/stm32/f1/gpio.h \
- /home/hades/bp/stm32/libopencm3/include/libopencm3/stm32/common/gpio_common_all.h \
- /home/hades/bp/stm32/libopencm3/include/libopencm3/stm32/timer.h \
- /home/hades/bp/stm32/libopencm3/include/libopencm3/stm32/f1/timer.h \
- /home/hades/bp/stm32/libopencm3/include/libopencm3/stm32/common/timer_common_all.h \
- /home/hades/bp/stm32/libopencm3/include/libopencm3/cm3/nvic.h \
- /home/hades/bp/stm32/libopencm3/include/libopencm3/dispatch/nvic.h \
- /home/hades/bp/stm32/libopencm3/include/libopencm3/stm32/f1/nvic.h
+ /home/supernova/bp/stm32/libopencm3/include/libopencm3/stm32/memorymap.h \
+ /home/supernova/bp/stm32/libopencm3/include/libopencm3/stm32/f1/memorymap.h \
+ /home/supernova/bp/stm32/libopencm3/include/libopencm3/cm3/memorymap.h \
+ /home/supernova/bp/stm32/libopencm3/include/libopencm3/stm32/f1/rcc.h \
+ /home/supernova/bp/stm32/libopencm3/include/libopencm3/stm32/common/rcc_common_all.h \
+ /home/supernova/bp/stm32/libopencm3/include/libopencm3/stm32/gpio.h \
+ /home/supernova/bp/stm32/libopencm3/include/libopencm3/stm32/f1/gpio.h \
+ /home/supernova/bp/stm32/libopencm3/include/libopencm3/stm32/common/gpio_common_all.h \
+ /home/supernova/bp/stm32/libopencm3/include/libopencm3/stm32/timer.h \
+ /home/supernova/bp/stm32/libopencm3/include/libopencm3/stm32/f1/timer.h \
+ /home/supernova/bp/stm32/libopencm3/include/libopencm3/stm32/common/timer_common_all.h \
+ /home/supernova/bp/stm32/libopencm3/include/libopencm3/cm3/nvic.h \
+ /home/supernova/bp/stm32/libopencm3/include/libopencm3/dispatch/nvic.h \
+ /home/supernova/bp/stm32/libopencm3/include/libopencm3/stm32/f1/nvic.h
